@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harry Potter Trivia</title>
+    <!-- Tailwind CSS for modern, responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Apply 'Inter' font to the body for a clean look */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c; /* Dark charcoal background for the entire page */
+            color: #e2e8f0; /* Light gray text for contrast */
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+            min-height: 100vh; /* Full viewport height */
+            margin: 0;
+            padding: 20px; /* Add some padding around the edges for smaller screens */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
+
+        /* Container for the main game content */
+        .game-container {
+            background-color: #2d3748; /* Slightly lighter dark background for the card */
+            border-radius: 1rem; /* Rounded corners for a modern feel */
+            padding: 2.5rem; /* Ample internal spacing */
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+            width: 100%; /* Full width within its parent */
+            max-width: 600px; /* Maximum width for larger screens to prevent stretching */
+            text-align: center; /* Center all inline content */
+        }
+
+        /* Styling for the question text */
+        .question {
+            font-size: 1.5rem; /* Large font size for readability */
+            margin-bottom: 2rem; /* Space below the question */
+            font-weight: 600; /* Semi-bold text */
+        }
+
+        /* Grid layout for answer buttons, making them responsive */
+        .answers-grid {
+            display: grid;
+            /* Auto-fit columns, each at least 200px wide, distributing remaining space */
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem; /* Space between grid items */
+            margin-bottom: 2rem; /* Space below the answer grid */
+        }
+
+        /* Styling for individual answer buttons */
+        .answer-button {
+            background-color: #4a5568; /* Dark gray button background */
+            color: #e2e8f0; /* Light text on buttons */
+            padding: 1rem 1.5rem; /* Vertical and horizontal padding */
+            border-radius: 0.75rem; /* Rounded corners for buttons */
+            border: none; /* No default border */
+            cursor: pointer; /* Indicate clickable element */
+            font-size: 1.1rem; /* Readable font size */
+            transition: background-color 0.3s ease, transform 0.1s ease; /* Smooth transition for hover effects */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for buttons */
+        }
+
+        /* Hover effect for answer buttons */
+        .answer-button:hover {
+            background-color: #636b77; /* Slightly darker on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+
+        /* Active (click) effect for answer buttons */
+        .answer-button:active {
+            transform: translateY(0); /* Reset lift when clicked for a press effect */
+        }
+
+        /* Styling for the correct answer button after selection */
+        .answer-button.correct {
+            background-color: #48bb78; /* Green for correct answers */
+        }
+
+        /* Styling for an incorrect answer button after selection */
+        .answer-button.wrong {
+            background-color: #ef4444; /* Red for wrong answers */
+        }
+
+        /* Styling for the score display */
+        .score {
+            font-size: 1.2rem; /* Readable font size */
+            font-weight: 500; /* Medium font weight */
+            margin-bottom: 1.5rem; /* Space below the score */
+        }
+
+        /* Styling for the restart button */
+        .restart-button {
+            background-color: #63b3ed; /* Blue background for restart button */
+            color: #2d3748; /* Dark text on blue button */
+            padding: 0.75rem 1.5rem; /* Padding for the button */
+            border-radius: 0.75rem; /* Rounded corners */
+            border: none; /* No default border */
+            cursor: pointer; /* Indicate clickable element */
+            font-size: 1rem; /* Standard font size */
+            transition: background-color 0.3s ease, transform 0.1s ease; /* Smooth transition for hover effects */
+        }
+
+        /* Hover effect for restart button */
+        .restart-button:hover {
+            background-color: #4299e1; /* Darker blue on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+
+        /* Custom message box styling (instead of default alert()) */
+        .message-box {
+            position: fixed; /* Fixed position relative to the viewport */
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Adjust for true centering */
+            background-color: #2d3748; /* Dark background */
+            padding: 2rem; /* Ample internal spacing */
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* Stronger shadow for pop-up effect */
+            z-index: 1000; /* Ensure it's on top of other content */
+            display: none; /* Hidden by default, shown via JavaScript */
+            flex-direction: column; /* Stack content vertically */
+            align-items: center; /* Center items horizontally */
+            justify-content: center; /* Center items vertically */
+            min-width: 300px; /* Minimum width */
+            max-width: 90vw; /* Max width to ensure responsiveness on small screens */
+            text-align: center; /* Center text */
+        }
+
+        /* Content inside the message box */
+        .message-box-content {
+            margin-bottom: 1.5rem; /* Space below the message text */
+            font-size: 1.2rem; /* Readable font size */
+            color: #e2e8f0; /* Light text color */
+        }
+
+        /* Button inside the message box */
+        .message-box-button {
+            background-color: #63b3ed; /* Blue background */
+            color: #2d3748; /* Dark text */
+            padding: 0.75rem 1.5rem; /* Padding */
+            border-radius: 0.75rem; /* Rounded corners */
+            border: none; /* No default border */
+            cursor: pointer; /* Indicate clickable element */
+            font-size: 1rem; /* Standard font size */
+            transition: background-color 0.3s ease; /* Smooth hover transition */
+        }
+
+        /* Hover effect for message box button */
+        .message-box-button:hover {
+            background-color: #4299e1; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+    <!-- Main game container -->
+    <div class="game-container">
+        <h1 class="text-3xl font-bold mb-6 text-indigo-300">Harry Potter Trivia Challenge</h1>
+        <div id="question-display" class="question"></div>
+        <div id="answers-grid" class="answers-grid">
+            <!-- Answer buttons will be dynamically inserted here by JavaScript -->
+        </div>
+        <div id="score-display" class="score">Score: 0</div>
+        <button id="restart-button" class="restart-button hidden">Restart Game</button>
+    </div>
+
+    <!-- Custom Message Box (hidden by default) -->
+    <div id="message-box" class="message-box">
+        <div id="message-box-content" class="message-box-content"></div>
+        <button id="message-box-button" class="message-box-button">OK</button>
+    </div>
+
+    <script>
+        // Array of trivia questions, each with a question, possible answers, and the correct answer.
+        const questions = [
+            {
+                question: "What is the name of Harry Potter's owl?",
+                answers: ["Hedwig", "Errol", "Pigwidgeon", "Fawkes"],
+                correct: "Hedwig"
+            },
+            {
+                question: "What house is Harry Potter in?",
+                answers: ["Slytherin", "Hufflepuff", "Gryffindor", "Ravenclaw"],
+                correct: "Gryffindor"
+            },
+            {
+                question: "What is the name of the magical map that shows everyone's location at Hogwarts?",
+                answers: ["The Marauder's Map", "The Hogwarts Map", "The Seeker's Map", "The Secret Map"],
+                correct: "The Marauder's Map"
+            },
+            {
+                question: "What is Voldemort's real name?",
+                answers: ["Tom Riddle", "Severus Snape", "Lucius Malfoy", "Albus Dumbledore"],
+                correct: "Tom Riddle"
+            },
+            {
+                question: "What position does Harry play on the Quidditch team?",
+                answers: ["Chaser", "Beater", "Seeker", "Keeper"],
+                correct: "Seeker"
+            },
+            {
+                question: "What is the name of the three-headed dog guarding the Sorcerer's Stone?",
+                answers: ["Fluffy", "Fang", "Norbert", "Buckbeak"],
+                correct: "Fluffy"
+            },
+            {
+                question: "Which of these is NOT a Horcrux?",
+                answers: ["Harry Potter", "Tom Riddle's Diary", "The Sword of Gryffindor", "Helga Hufflepuff's Cup"],
+                correct: "The Sword of Gryffindor" // The Sword of Gryffindor is not a Horcrux.
+            },
+            {
+                question: "What magical creature does Hagrid teach the students about in 'Prisoner of Azkaban'?",
+                answers: ["Thestrals", "Hippogriffs", "Blast-Ended Skrewts", "Nifflers"],
+                correct: "Hippogriffs"
+            },
+            {
+                question: "What is the spell for disarming an opponent?",
+                answers: ["Expelliarmus", "Lumos", "Wingardium Leviosa", "Stupefy"],
+                correct: "Expelliarmus"
+            },
+            {
+                question: "What is the name of the wizard bank?",
+                answers: ["Gringotts", "Hogwarts Bank", "Diagon Alley Bank", "Wizarding Vaults"],
+                correct: "Gringotts"
+            }
+        ];
+
+        // Initialize game state variables
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        // Get references to HTML elements
+        const questionDisplay = document.getElementById('question-display');
+        const answersGrid = document.getElementById('answers-grid');
+        const scoreDisplay = document.getElementById('score-display');
+        const restartButton = document.getElementById('restart-button');
+        const messageBox = document.getElementById('message-box');
+        const messageBoxContent = document.getElementById('message-box-content');
+        const messageBoxButton = document.getElementById('message-box-button');
+
+        /**
+         * Displays a custom message box with a given message.
+         * This function is used instead of the built-in `alert()` for better UI control.
+         * @param {string} message - The text message to be displayed in the box.
+         */
+        function showMessageBox(message) {
+            messageBoxContent.textContent = message; // Set the message text
+            messageBox.style.display = 'flex'; // Make the message box visible
+        }
+
+        /**
+         * Hides the custom message box.
+         */
+        function hideMessageBox() {
+            messageBox.style.display = 'none'; // Hide the message box
+        }
+
+        /**
+         * Loads and displays the current question and its corresponding answer buttons.
+         * If all questions have been answered, it calls `displayResults()`.
+         */
+        function loadQuestion() {
+            // Ensure the restart button is hidden while the quiz is active
+            restartButton.classList.add('hidden');
+
+            if (currentQuestionIndex < questions.length) {
+                // Get the current question object
+                const q = questions[currentQuestionIndex];
+                questionDisplay.textContent = q.question; // Display the question text
+                answersGrid.innerHTML = ''; // Clear any previously loaded answer buttons
+
+                // Create a button for each answer and add an event listener
+                q.answers.forEach(answer => {
+                    const button = document.createElement('button');
+                    button.textContent = answer; // Set button text
+                    button.classList.add('answer-button'); // Apply styling class
+                    // Attach click event listener to check the answer
+                    button.addEventListener('click', () => checkAnswer(answer, q.correct, button));
+                    answersGrid.appendChild(button); // Add button to the answers grid
+                });
+            } else {
+                // If all questions are answered, display the final results
+                displayResults();
+            }
+        }
+
+        /**
+         * Checks if the selected answer is correct, updates the score,
+         * provides visual feedback, and prepares for the next question.
+         * @param {string} selectedAnswer - The answer chosen by the user.
+         * @param {string} correctAnswer - The correct answer for the current question.
+         * @param {HTMLElement} clickedButton - The HTML button element that the user clicked.
+         */
+        function checkAnswer(selectedAnswer, correctAnswer, clickedButton) {
+            // Disable all answer buttons to prevent multiple selections for the same question
+            Array.from(answersGrid.children).forEach(button => button.disabled = true);
+
+            if (selectedAnswer === correctAnswer) {
+                score++; // Increment score if correct
+                clickedButton.classList.add('correct'); // Apply 'correct' styling to the clicked button
+                scoreDisplay.textContent = `Score: ${score}`; // Update score display
+                showMessageBox('Correct!'); // Show "Correct!" message
+            } else {
+                clickedButton.classList.add('wrong'); // Apply 'wrong' styling to the clicked button
+                // Find and highlight the correct answer among the buttons
+                const correctButton = Array.from(answersGrid.children).find(button => button.textContent === correctAnswer);
+                if (correctButton) {
+                    correctButton.classList.add('correct'); // Highlight the correct answer in green
+                }
+                showMessageBox(`Wrong! The correct answer was "${correctAnswer}".`); // Show "Wrong!" message with correct answer
+            }
+
+            // Set the behavior for the message box's "OK" button: hide the box,
+            // then move to the next question or display results.
+            messageBoxButton.onclick = () => {
+                hideMessageBox(); // Hide the message box
+                currentQuestionIndex++; // Move to the next question
+                loadQuestion(); // Load the next question or results
+            };
+        }
+
+        /**
+         * Displays the final score and a "Quiz Finished!" message when the quiz ends.
+         * Also makes the restart button visible.
+         */
+        function displayResults() {
+            questionDisplay.textContent = `Quiz Finished!`; // Update question area to indicate end of quiz
+            answersGrid.innerHTML = ''; // Clear answer buttons
+            scoreDisplay.textContent = `Your final score is: ${score} out of ${questions.length}`; // Display final score
+            restartButton.classList.remove('hidden'); // Show the restart button
+            showMessageBox(`Quiz Completed! You scored ${score} out of ${questions.length}.`); // Show final score in message box
+        }
+
+        /**
+         * Resets the game to its initial state, allowing the user to play again.
+         */
+        function restartGame() {
+            currentQuestionIndex = 0; // Reset question index
+            score = 0; // Reset score
+            scoreDisplay.textContent = `Score: ${score}`; // Update score display
+            restartButton.classList.add('hidden'); // Hide the restart button
+            loadQuestion(); // Start the quiz from the beginning
+        }
+
+        // Add event listener to the restart button
+        restartButton.addEventListener('click', restartGame);
+
+        // Initial call to load the first question when the window finishes loading
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
